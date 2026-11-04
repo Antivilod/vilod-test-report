@@ -1,9 +1,11 @@
 {
   "title": "Demo application - synthetic QA report",
+  "environment": {"Application": "Demo 1.0", "Platform": "Synthetic test environment"},
   "defects": [{
     "id": "DEMO-001",
     "title": "Empty form is accepted",
     "severity": "Medium",
+    "status": "open",
     "steps": ["Open the example form", "Leave all fields empty", "Press Save"],
     "expected": "Required field validation is displayed.",
     "actual": "The form is accepted."

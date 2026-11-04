@@ -21,7 +21,7 @@ Exit code 0 means success, 2 means input, schema or output error.
 
 ## Requirements and status
 
-Python 3.10+, standard library only. Initial preview 0.1.0. No installation
+Python 3.10+, standard library only. Source preview 0.2.0. No installation
 of external packages is required. Linux tests passed; Windows is not yet verified.
 No network calls, telemetry or accounts. Input content is not anonymized.
 Review reports before sharing. No EXE or graphical interface is included.
@@ -42,3 +42,9 @@ Use GitHub Code > Download ZIP, extract it, and run the commands above from the 
 ## Скачать и запустить
 
 Нажмите Code > Download ZIP, распакуйте архив и откройте терминал в папке программы. Нужен Python 3.10 или новее. Команды выше запускаются без установки сторонних библиотек. Это исходники, не EXE-установщик.
+
+## Environment and status in 0.2.0
+
+The optional top-level `environment` object contains string keys and string values, for example `{"Application":"Demo 1.0","Platform":"Test environment"}`. Each defect can have `status`: `open`, `in_progress`, `fixed` or `closed`. Missing status defaults to `open`, preserving older JSON input. The HTML shows an environment section and counts by status. Eight unit tests passed on Linux.
+
+Можно указать окружение проверки и статус каждого дефекта. Все эти поля попадают в отчёт, поэтому не добавляйте имя пользователя, личные пути, адреса или секреты. Значения экранируются для HTML, но не обезличиваются.
