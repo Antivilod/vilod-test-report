@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Filter HTML defect reports by one or more statuses.
+
 ## 0.2.0 - 2026-11-04
 
 Optional environment information, defect statuses and status counts. Existing reports default to open status. Duplicate JSON keys and nonstandard constants are rejected. Eight unit tests passed on Linux.

@@ -4,7 +4,7 @@ import html
 import json
 from pathlib import Path
 
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 STATUSES = ('open', 'in_progress', 'fixed', 'closed')
 
 
@@ -21,7 +21,7 @@ def reject_constant(_value):
     raise ValueError('Nonstandard JSON constant')
 
 
-def render(data):
+def render(data, statuses=None):
     if not isinstance(data, dict) or not isinstance(data.get('title'), str):
         raise ValueError('title must be a string')
     defects = data.get('defects')
@@ -48,6 +48,8 @@ def render(data):
         status = item.get('status', 'open')
         if not isinstance(status, str) or status not in STATUSES:
             raise ValueError('Invalid defect status')
+        if statuses is not None and status not in statuses:
+            continue
         counts[status] += 1
         e = lambda name: html.escape(item[name], quote=True)
         step_html = ''.join('<li>' + html.escape(s) + '</li>' for s in steps)
@@ -55,6 +57,10 @@ def render(data):
                      '<p>Severity: ' + e('severity') + ' | Status: ' + status + '</p><ol>' + step_html + '</ol>'
                      '<h3>Expected</h3><p>' + e('expected') + '</p>'
                      '<h3>Actual</h3><p>' + e('actual') + '</p></article>')
+    summary = str(len(cards))
+    if statuses is not None:
+        selected = ", ".join(status for status in STATUSES if status in statuses)
+        summary += f" of {len(defects)} (filter: {selected})"
     title = html.escape(data['title'], quote=True)
     return ('<!doctype html><html lang="en"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -64,7 +70,7 @@ def render(data):
             'article{background:white;border:1px solid #ccd6e3;border-radius:12px;padding:24px;margin:20px 0}'
             'p,li,dt,dd{white-space:pre-wrap;overflow-wrap:anywhere}h1{font-size:32px}h3{font-size:16px}'
             '@media print{body{margin:0;background:white}article{break-inside:avoid}}'
-            '</style><h1>' + title + '</h1><p>Defects: ' + str(len(defects)) + '</p>'
+            '</style><h1>' + title + '</h1><p>Defects: ' + summary + '</p>'
             + '<p>' + ' | '.join(name + ': ' + str(counts[name]) for name in STATUSES) + '</p>'
             + ('<section><h2>Environment</h2><dl>' + env_html + '</dl></section>' if environment else '')
             + ''.join(cards) + '</html>')
@@ -73,11 +79,14 @@ def render(data):
 def main(argv=None):
     p = argparse.ArgumentParser(description='Vilod Test Report - JSON to local HTML')
     p.add_argument('--version', action='version', version=VERSION)
+    p.add_argument('--status', action='append', choices=STATUSES,
+                   help='Include a status. Repeat to include several.')
     p.add_argument('input'); p.add_argument('output')
     a = p.parse_args(argv)
     try:
-        document = render(json.loads(Path(a.input).read_text(encoding='utf-8-sig'),
-                                     object_pairs_hook=unique_object, parse_constant=reject_constant))
+        data = json.loads(Path(a.input).read_text(encoding='utf-8-sig'),
+                                     object_pairs_hook=unique_object, parse_constant=reject_constant)
+        document = render(data, set(a.status) if a.status else None)
         with Path(a.output).open('x', encoding='utf-8') as f:
             f.write(document)
     except (ValueError, OSError, RecursionError):

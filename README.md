@@ -7,6 +7,12 @@ Useful for a small QA handoff when a full issue tracker is unnecessary.
 
 `python report.py example.json demo-report.html`
 
+To include only unfinished defects, run:
+
+`python report.py example.json pending.html --status open --status in_progress`
+
+Without a filter, all defects are included. The full input is always validated.
+
 Open demo-report.html in a browser. The output file must not already exist.
 Required top-level fields: title (string), defects (array). Every defect needs
 id, title, severity, expected and actual (strings), and steps (array of strings).
@@ -21,7 +27,7 @@ Exit code 0 means success, 2 means input, schema or output error.
 
 ## Requirements and status
 
-Python 3.10+, standard library only. Source preview 0.2.0. No installation
+Python 3.10+, standard library only. Source preview 0.3.0. No installation
 of external packages is required. Linux tests passed; Windows is not yet verified.
 No network calls, telemetry or accounts. Input content is not anonymized.
 Review reports before sharing. No EXE or graphical interface is included.
